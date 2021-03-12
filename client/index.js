@@ -8,8 +8,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Nota proxy
   // Hreinsa header og upplýsingar þegar ný gögn eru sótt
   // Sterkur leikur að refactora úr virkni fyrir event handler í sér fall
-
-  const earthquakes = await fetchEarthquakes();
+  const urlParams = new URLSearchParams(window.location.search);
+  const data = await fetchEarthquakes(urlParams.get('type'), urlParams.get('period'));
+  const earthquakes = data.data.features;
 
   // Fjarlægjum loading skilaboð eftir að við höfum sótt gögn
   const loading = document.querySelector('.loading');
@@ -22,8 +23,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
   }
 
+  let earthquakeInfoText = '';
+  switch(urlParams.get('type')) {
+    case 'significant':
+      earthquakeInfoText += 'Verulegir jarðskjálftar, ';
+      break;
+    case '4.5':
+      earthquakeInfoText += '4,5+ á richter jarðskjálftar, ';
+      break;
+    case '2.5':
+      earthquakeInfoText += '2,5+ á richter jarðskjálftar, ';
+      break;
+    case '1.0':
+      earthquakeInfoText += '1,0+ á richter jarðskjálftar, ';
+      break;
+    case 'all':
+      earthquakeInfoText += 'Allir jarðskjálftar, ';
+      break;
+  }
+  switch(urlParams.get('period')) {
+    case 'hour':
+      earthquakeInfoText += 'seinustu klukkustund';
+      break;
+    case 'day':
+      earthquakeInfoText += 'seinasta dag';
+      break;
+    case 'week':
+      earthquakeInfoText += 'seinustu viku';
+      break;
+    case 'month':
+      earthquakeInfoText += 'seinasta mánuð';
+      break;
+  }
+
+  
   const ul = document.querySelector('.earthquakes');
   const map = document.querySelector('.map');
+  
+  const earthquakeInfo = document.querySelector('h1');
+  earthquakeInfo.innerHTML = earthquakeInfoText;
+
+  let cacheInfoText = '';
+  if (data.info.cached) {
+    cacheInfoText += 'Gögn eru í cache. ';
+  } else {
+    cacheInfoText += 'Gögn eru ekki í cache. ';
+  }
+  cacheInfoText += `Fyrirspurn tók ${data.info.elapsed}  sek.`;
+  const cacheInfo = document.querySelector('.cache');
+  cacheInfo.innerHTML = cacheInfoText;
 
   init(map);
 
