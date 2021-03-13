@@ -13,8 +13,6 @@ const redisOptions = {
   url
 }
 
-console.log('Options: ', redisOptions);
-
 const client = redis.createClient(redisOptions);
 
 const asyncGet = util.promisify(client.get).bind(client);
