@@ -5,9 +5,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const {
+  REDIS_URL: url,
+} = process.env
+
 const redisOptions = {
-  REDIS_URL: 'redis://127.0.0.1:6379/0',
-} = process.env;
+  url
+}
+
+console.log('Options: ', redisOptions);
 
 const client = redis.createClient(redisOptions);
 
