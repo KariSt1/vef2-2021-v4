@@ -32,12 +32,10 @@ app.use((req, res, next) => {
 
 app.use(express.static(join(path, '../public')));
 
-// TODO setja upp proxy þjónustu
-// TODO birta index.html skjal
-
 app.get('/', (req, res) => {
   res.sendFile(join(path, '../index.html'));
 });
+
 app.use('/proxy', proxyRouter);
 
 /**

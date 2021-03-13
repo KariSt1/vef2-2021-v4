@@ -1,30 +1,38 @@
+/* eslint-disable default-case */
 import { fetchEarthquakes } from './lib/earthquakes';
 import { el, element, formatDate } from './lib/utils';
 import { init, createPopup, clearMarkers } from './lib/map';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // TODO
-  // Bæta við virkni til að sækja úr lista
-  // Nota proxy
-  // Hreinsa header og upplýsingar þegar ný gögn eru sótt
-  // Sterkur leikur að refactora úr virkni fyrir event handler í sér fall
-  //let data = [];
-  //let earthquakes = [];
+  const ul = document.querySelector('.earthquakes');
+  const map = document.querySelector('.map');
+  const earthquakeInfo = document.querySelector('h1');
+  const cacheInfo = document.querySelector('.cache');
+  const loading = document.querySelector('.loading');
+  const parent = loading.parentNode;
 
-  document.querySelectorAll('li a').forEach( (button) => {
-    button.addEventListener('click', async function(e) {
+  init(map);
+
+  // Event listener for each earthquake link
+  document.querySelectorAll('li a').forEach((button) => {
+    button.addEventListener('click', async (e) => {
       e.preventDefault();
+
+      // Remove existing earthquake data
       ul.textContent = '';
       earthquakeInfo.textContent = '';
       cacheInfo.textContent = '';
+
+      // Fetching earthquake data for the clicked link
       const urlParams = new URLSearchParams(button.search);
       document.querySelector('.loading').classList.remove('hidden');
       const data = await fetchEarthquakes(urlParams.get('type'), urlParams.get('period'));
       document.querySelector('.loading').classList.add('hidden');
       const earthquakes = data.data.features;
 
+      // Creating the string for the type of earthquake that was requested
       let earthquakeInfoText = '';
-      switch(urlParams.get('type')) {
+      switch (urlParams.get('type')) {
         case 'significant':
           earthquakeInfoText += 'Verulegir jarðskjálftar, ';
           break;
@@ -41,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           earthquakeInfoText += 'Allir jarðskjálftar, ';
           break;
       }
-      switch(urlParams.get('period')) {
+      switch (urlParams.get('period')) {
         case 'hour':
           earthquakeInfoText += 'seinustu klukkustund';
           break;
@@ -58,6 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       earthquakeInfo.innerHTML = earthquakeInfoText;
 
+      /*
+      Constructing string with info about if the data
+      was cached and how long it took to fetch
+      */
       let cacheInfoText = '';
       if (data.info.cached) {
         cacheInfoText += 'Gögn eru í cache. ';
@@ -66,35 +78,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       cacheInfoText += `Fyrirspurn tók ${data.info.elapsed}  sek.`;
       cacheInfo.innerHTML = cacheInfoText;
-    
+
       if (!earthquakes) {
         parent.appendChild(
           el('p', 'Villa við að sækja gögn'),
         );
       }
-    
+
+      // Clearing existing markers from the map
       clearMarkers();
-      
-    
+
       earthquakes.forEach((quake) => {
         const {
           title, mag, time, url,
         } = quake.properties;
-    
+
         const link = element('a', { href: url, target: '_blank' }, null, 'Skoða nánar');
-    
+
         const markerContent = el('div',
           el('h3', title),
           el('p', formatDate(time)),
           el('p', link));
         const marker = createPopup(quake.geometry, markerContent.outerHTML);
-    
+
         const onClick = () => {
           marker.openPopup();
         };
-    
+
         const li = el('li');
-    
+
         li.appendChild(
           el('div',
             el('h2', title),
@@ -109,24 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
               element('button', null, { click: onClick }, 'Sjá á korti'),
               link)),
         );
-    
+
         ul.appendChild(li);
       });
     });
   });
-
-  const ul = document.querySelector('.earthquakes');
-  const map = document.querySelector('.map');
-  const earthquakeInfo = document.querySelector('h1');
-  const cacheInfo = document.querySelector('.cache');
-  const loading = document.querySelector('.loading');
-  const parent = loading.parentNode;
-
-  init(map);
-
-  //const urlParams = new URLSearchParams(window.location.search);
-  //const data = await fetchEarthquakes(urlParams.get('type'), urlParams.get('period'));
-  //const earthquakes = data.data.features;
-
-  // Fjarlægjum loading skilaboð eftir að við höfum sótt gögn
 });

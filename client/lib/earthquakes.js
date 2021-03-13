@@ -1,5 +1,11 @@
+/**
+ * Fetches earthquake data of a certain type and period
+ * from the proxy server.
+ * @param {string} type Earthquake strength
+ * @param {string} period Period of time when earthquakes happened
+ * @returns Earthquake data or null if it didn't work
+ */
 export async function fetchEarthquakes(type, period) {
-  // TODO sækja gögn frá proxy þjónustu
   const url = new URL(`/proxy?period=${period}&type=${type}`, window.location).href;
   let result;
   try {
