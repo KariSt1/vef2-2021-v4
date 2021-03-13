@@ -1,10 +1,13 @@
 // TODO útfæra redis cache
 import redis from 'redis';
 import util from 'util';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const redisOptions = {
-  url: 'redis://127.0.0.1:6379/0',
-};
+  REDIS_URL: 'redis://127.0.0.1:6379/0',
+} = process.env;
 
 const client = redis.createClient(redisOptions);
 
