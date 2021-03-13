@@ -1,6 +1,6 @@
 export async function fetchEarthquakes(type, period) {
   // TODO sækja gögn frá proxy þjónustu
-  const url = new URL(`http://localhost:3001/proxy?period=${period}&type=${type}`).href;
+  const url = new URL(`/proxy?period=${period}&type=${type}`).href;
   let result;
   try {
     result = await fetch(url);
