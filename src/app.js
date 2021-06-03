@@ -66,6 +66,7 @@ function errorHandler(err, req, res, next) {
   res.status(500).render('error', { title });
 }
 
+
 app.use(notFoundHandler);
 app.use(errorHandler);
 
